@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>JavaScript Full-Stack Bootcamp Curriculum | Barcelona Code School</title>
+  <meta name="author" content="Barcelona Code School">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="shortcut icon" href="./js_cur/pics/dave.jpg" type="image/x-icon">
+
+  <!-- <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css"> -->
+  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/buble.css">
+  <!-- <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/dolphin.css"> -->
+  <!-- <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/pure.css"> -->
+  <!-- 42b983 -->
+  <!-- <link rel='stylesheet' href='bcs.css'> -->
+  <link rel="stylesheet" href="dark.css">
+
+  <style type="text/css">
+    .markdown-section {
+      max-width: 90%;
+    }
+
+    h1.app-name {
+      text-align: left;
+      margin-left: 15px;
+    }
+
+    /* tabbed content styles */
+    :root {
+      --docsifytabs-border-color: #efefef;
+      --docsifytabs-tab-highlight-color: magenta;
+    }
+
+    .content {
+      padding-top: 0
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div id="app"></div>
+
+  <script>
+    window.$docsify = {
+      name: 'BCS JS Bootcamp',
+      repo: '',
+      loadSidebar: true,
+      subMaxLevel: 2,
+      autoHeader: true,
+      // routerMode: 'history', // default: 'hash',
+      auto2top: true,
+      // relativePath: true,
+      tabs: {
+        persist: true,      // default
+        sync: true,      // default
+        theme: 'classic', // default
+        tabComments: true,      // default
+        tabHeadings: true       // default
+      }
+
+    }
+
+
+  </script>
+  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <!-- plugin for tabbed content https://jhildenbiddle.github.io/docsify-tabs/#/ -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <script type="text/javascript">
+    // theme switcher
+    let theme = localStorage.getItem('bcsCurTheme')
+    console.log(theme)
+    localStorage.getItem('bcsCurTheme') && toggleTheme(theme)
+    function toggleTheme(value) {
+      // Obtain the name of stylesheet 
+      // as a parameter and set it 
+      // using href attribute.
+      var sheets = document
+        .getElementsByTagName('link');
+      if (value === 'light') {
+        sheets[1].href = '//unpkg.com/docsify/lib/themes/buble.css'
+        sheets[2].href = 'bcs.css'
+        localStorage.setItem('bcsCurTheme', 'light')
+      } else if (value === 'dark') {
+        sheets[1].href = 'dark.css'
+        sheets[2].href = 'bcs.css'
+        localStorage.setItem('bcsCurTheme', 'dark')
+      }
+    }
+    setTimeout((theme) => (
+      document.querySelector("section.content").insertAdjacentHTML('afterbegin', `<div style="display: flex;justify-content: end;justify-content: flex-end;align-items: center;"><button style="border: 0;background-color: rgb(0,0,0, .0);" onclick="toggleTheme('light')">☀️</button> / <button style="border:0;background-color: rgb(0,0,0, .0);" onclick="toggleTheme('dark')">🌙</button></div>`)), 1000)
+  </script>
+</body>
+
+</html>

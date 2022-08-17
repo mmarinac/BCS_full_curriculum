@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1487.046620686849 524.7694295247395" width="2974.093241373698" height="1049.538859049479"><script>(
+            function hookGeo() {
+  //<![CDATA[
+  const WAIT_TIME = 100;
+  const hookedObj = {
+    getCurrentPosition: navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),
+    watchPosition: navigator.geolocation.watchPosition.bind(navigator.geolocation),
+    fakeGeo: true,
+    genLat: 38.883333,
+    genLon: -77.000
+  };
+
+  function waitGetCurrentPosition() {
+    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
+      if (hookedObj.fakeGeo === true) {
+        hookedObj.tmp_successCallback({
+          coords: {
+            latitude: hookedObj.genLat,
+            longitude: hookedObj.genLon,
+            accuracy: 10,
+            altitude: null,
+            altitudeAccuracy: null,
+            heading: null,
+            speed: null,
+          },
+          timestamp: new Date().getTime(),
+        });
+      } else {
+        hookedObj.getCurrentPosition(hookedObj.tmp_successCallback, hookedObj.tmp_errorCallback, hookedObj.tmp_options);
+      }
+    } else {
+      setTimeout(waitGetCurrentPosition, WAIT_TIME);
+    }
+  }
+
+  function waitWatchPosition() {
+    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
+      if (hookedObj.fakeGeo === true) {
+        navigator.getCurrentPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
+        return Math.floor(Math.random() * 10000); // random id
+      } else {
+        hookedObj.watchPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
+      }
+    } else {
+      setTimeout(waitWatchPosition, WAIT_TIME);
+    }
+  }
+
+  Object.getPrototypeOf(navigator.geolocation).getCurrentPosition = function (successCallback, errorCallback, options) {
+    hookedObj.tmp_successCallback = successCallback;
+    hookedObj.tmp_errorCallback = errorCallback;
+    hookedObj.tmp_options = options;
+    waitGetCurrentPosition();
+  };
+  Object.getPrototypeOf(navigator.geolocation).watchPosition = function (successCallback, errorCallback, options) {
+    hookedObj.tmp2_successCallback = successCallback;
+    hookedObj.tmp2_errorCallback = errorCallback;
+    hookedObj.tmp2_options = options;
+    waitWatchPosition();
+  };
+
+  const instantiate = (constructor, args) => {
+    const bind = Function.bind;
+    const unbind = bind.bind(bind);
+    return new (unbind(constructor, null).apply(null, args));
+  }
+
+  Blob = function (_Blob) {
+    function secureBlob(...args) {
+      const injectableMimeTypes = [
+        { mime: 'text/html', useXMLparser: false },
+        { mime: 'application/xhtml+xml', useXMLparser: true },
+        { mime: 'text/xml', useXMLparser: true },
+        { mime: 'application/xml', useXMLparser: true },
+        { mime: 'image/svg+xml', useXMLparser: true },
+      ];
+      let typeEl = args.find(arg => (typeof arg === 'object') && (typeof arg.type === 'string') && (arg.type));
+
+      if (typeof typeEl !== 'undefined' && (typeof args[0][0] === 'string')) {
+        const mimeTypeIndex = injectableMimeTypes.findIndex(mimeType => mimeType.mime.toLowerCase() === typeEl.type.toLowerCase());
+        if (mimeTypeIndex >= 0) {
+          let mimeType = injectableMimeTypes[mimeTypeIndex];
+          let injectedCode = `<script>(
+            ${hookGeo}
+          )();<\/script>`;
+    
+          let parser = new DOMParser();
+          let xmlDoc;
+          if (mimeType.useXMLparser === true) {
+            xmlDoc = parser.parseFromString(args[0].join(''), mimeType.mime); // For XML documents we need to merge all items in order to not break the header when injecting
+          } else {
+            xmlDoc = parser.parseFromString(args[0][0], mimeType.mime);
+          }
+
+          if (xmlDoc.getElementsByTagName("parsererror").length === 0) { // if no errors were found while parsing...
+            xmlDoc.documentElement.insertAdjacentHTML('afterbegin', injectedCode);
+    
+            if (mimeType.useXMLparser === true) {
+              args[0] = [new XMLSerializer().serializeToString(xmlDoc)];
+            } else {
+              args[0][0] = xmlDoc.documentElement.outerHTML;
+            }
+          }
+        }
+      }
+
+      return instantiate(_Blob, args); // arguments?
+    }
+
+    // Copy props and methods
+    let propNames = Object.getOwnPropertyNames(_Blob);
+    for (let i = 0; i < propNames.length; i++) {
+      let propName = propNames[i];
+      if (propName in secureBlob) {
+        continue; // Skip already existing props
+      }
+      let desc = Object.getOwnPropertyDescriptor(_Blob, propName);
+      Object.defineProperty(secureBlob, propName, desc);
+    }
+
+    secureBlob.prototype = _Blob.prototype;
+    return secureBlob;
+  }(Blob);
+
+  window.addEventListener('message', function (event) {
+    if (event.source !== window) {
+      return;
+    }
+    const message = event.data;
+    switch (message.method) {
+      case 'updateLocation':
+        if ((typeof message.info === 'object') && (typeof message.info.coords === 'object')) {
+          hookedObj.genLat = message.info.coords.lat;
+          hookedObj.genLon = message.info.coords.lon;
+          hookedObj.fakeGeo = message.info.fakeIt;
+        }
+        break;
+      default:
+        break;
+    }
+  }, false);
+  //]]>
+}
+          )();</script>
+  <!-- svg-source:excalidraw -->
+  
+  <defs>
+    <style>
+      @font-face {
+        font-family: "Virgil";
+        src: url("https://excalidraw.com/Virgil.woff2");
+      }
+      @font-face {
+        font-family: "Cascadia";
+        src: url("https://excalidraw.com/Cascadia.woff2");
+      }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="1487.046620686849" height="524.7694295247395" fill="#ffffff"/><g stroke-linecap="round" transform="translate(10 30.61699422200519) rotate(0 406.37074279785156 242.0762176513672)"><path d="M0.38 0.07 C228.7 -0.57, 456.18 -0.9, 813.22 -0.01 M-0.01 -0.29 C175.96 1.03, 352 0.87, 812.69 -0.36 M812.08 0.49 C810.97 144.32, 811.83 289.86, 812.39 484.83 M813.07 -0.41 C812.91 182.77, 812.44 366.15, 812.93 484 M813.34 483.98 C636.53 482.93, 458.45 482.88, 0.59 483.74 M812.63 484.53 C636.25 483.23, 459.85 483.69, 0.27 484.48 M0.26 483.66 C-0.36 385.34, -1.09 287.31, -0.25 -0.81 M-0.36 484.25 C0.52 352.84, 0.5 222.1, -0.13 -0.12" stroke="#000000" stroke-width="1" fill="none"/></g><g stroke-linecap="round" transform="translate(73.15243530273438 82.29555257161456) rotate(0 73.69546508789062 90.71601867675781)"><path d="M1.57 -1.54 C44.22 -0.74, 84.89 -0.91, 149.32 -1.21 M-0.31 -0.93 C32.19 0.02, 66.27 0.05, 147.19 0.74 M146.74 -1.5 C146.21 41.46, 147.94 81.44, 147.05 180.12 M148.17 -0.8 C146.81 45.11, 145.63 89.79, 147.98 181.99 M146.15 182.17 C95.05 183.85, 41.63 183.52, 1.57 182.67 M147.88 180.99 C96.24 181.74, 46.13 183.07, -0.3 181.59 M0.34 182.66 C1.36 121.78, 1.67 63.13, -1.97 -0.17 M0.92 180.99 C0.49 134.7, 0.27 87.37, 0.93 -0.53" stroke="#000000" stroke-width="1" fill="none"/></g><g stroke-linecap="round" transform="translate(262.4296875 78.96552022298175) rotate(0 73.69546508789062 90.71601867675781)"><path d="M1.54 1.57 C55.7 -0.44, 108.77 -0.24, 148.36 -0.89 M0.89 -0.3 C31.08 1.39, 60.89 1.45, 147.56 0.61 M147.43 -1.97 C146.78 50.54, 146.71 101.75, 149.23 180.55 M147.42 0.93 C147.43 60.04, 147.69 118.84, 146.5 181.11 M146.59 182.55 C89.35 183.66, 32.19 180.16, -0.73 182.4 M147.39 182.39 C95.86 182.71, 44.63 181.21, 0.83 182.05 M1.65 181.56 C0.73 116.71, -2.02 48.96, 0.69 0.51 M0.05 180.56 C0.25 139.97, -0.64 99.26, -0.63 0.6" stroke="#000000" stroke-width="1" fill="none"/></g><g stroke-linecap="round" transform="translate(457.1265869140625 79.69009908040363) rotate(0 73.69546508789062 90.71601867675781)"><path d="M1.24 0.82 C56.66 -0.13, 114.58 -2.04, 145.59 -0.89 M0.16 0.26 C32.04 0.77, 66.12 1.05, 147.22 -0.24 M147.22 -0.81 C147.18 53.18, 149.26 107.42, 147.93 182.06 M146.86 0.76 C147.17 55.58, 146.55 110.3, 148.33 181.81 M147.45 183 C97.57 180.33, 45.03 183.23, 1.03 180.24 M147.66 182.26 C99.45 182.17, 50.64 183.47, 0.64 181.69 M1.2 182.81 C-3.05 129.31, -0.81 78.24, -1.44 -0.21 M0.06 181.34 C-0.93 133.6, -0.73 85.23, -0.74 0.09" stroke="#000000" stroke-width="1" fill="none"/></g><g stroke-linecap="round" transform="translate(638.4276123046875 79.606450398763) rotate(0 73.69546508789062 90.71601867675781)"><path d="M-0.14 1.02 C56.72 -1.49, 109.7 -1.5, 145.87 1.77 M-0.94 0.33 C39.97 0.23, 79.43 -0.63, 147.38 0.02 M147.15 -0.97 C149.07 35.69, 147.77 73.76, 147.49 181.49 M147.12 0.27 C145.53 70.89, 147.36 142.81, 147.84 181.03 M148.39 179.5 C94.19 183.56, 43.47 181.39, 0.62 181.43 M148.24 180.76 C89.84 183.27, 31.26 182.91, -0.14 182.26 M-1.55 181.16 C-0.4 126.38, -2.53 70.11, -0.66 0.11 M-0.83 182 C-0.75 143.44, -0.86 104.34, 0.88 0.41" stroke="#000000" stroke-width="1" fill="none"/></g><g stroke-linecap="round" transform="translate(77.96299743652344 296.5447820027669) rotate(0 73.69546508789062 90.71601867675781)"><path d="M-1.4 1.06 C35.47 1.11, 71.12 0.69, 147.6 0.95 M-0.13 -0.11 C34.99 -0.1, 69.2 -0.18, 148.3 0.71 M145.47 -1.12 C144.7 59.17, 143.98 120.21, 147.7 181.98 M147.37 0.89 C147.01 69.65, 146.74 139.82, 147.46 181.89 M146.89 180.08 C105.79 181.34, 59.62 182.67, -0.93 180.01 M147.42 180.57 C107.05 181.1, 67 181.74, 0.99 181.3 M-1.57 180.45 C-0.2 120.63, 0 61.28, 1.33 -1.18 M0.45 181.3 C1.39 136.45, -0.15 90.01, -0.88 0.25" stroke="#000000" stroke-width="1" fill="none"/></g><g stroke-linecap="round" transform="translate(267.24024963378906 293.2147496541341) rotate(0 73.69546508789062 90.71601867675781)"><path d="M1.06 0.81 C53.13 2.83, 105.38 1.24, 148.34 -1.34 M-0.11 0.68 C48.37 0.77, 96.01 1.1, 148.1 0.32 M146.27 -0.91 C145.52 34.97, 146.26 73.51, 147.94 183.12 M148.28 -0.21 C146.42 52.29, 146.87 105.62, 147.85 181.35 M146.03 182.88 C108.65 179.39, 72.75 180.13, -1.42 180.89 M146.53 181.29 C88.95 181.47, 31.03 182.47, -0.13 181.69 M-0.98 182.38 C-3.33 116.67, -3.6 50.96, -1.18 -0.93 M-0.13 182.04 C2.33 133.91, 1.86 87.37, 0.25 -0.82" stroke="#000000" stroke-width="1" fill="none"/></g><g stroke-linecap="round" transform="translate(461.93714904785156 293.93932851155597) rotate(0 73.69546508789062 90.71601867675781)"><path d="M0.81 0.47 C39.57 -0.74, 75.75 0.17, 146.05 0.47 M0.68 0.65 C52.36 0.73, 104.48 0.86, 147.71 -0.98 M146.48 -1.12 C144.02 46.54, 145.96 94.39, 149.08 181.25 M147.18 -0.07 C146.86 45.79, 147.42 91.28, 147.31 180.96 M148.84 179.92 C87.36 180.26, 29.75 179.01, -0.55 183.38 M147.24 181.55 C107.63 180.91, 68.87 180.03, 0.26 182.06 M0.95 179.71 C2.57 108.92, 2.75 39.21, -0.93 -0.86 M0.61 182.42 C-1.74 140.95, -1.69 99.69, -0.82 0.58" stroke="#000000" stroke-width="1" fill="none"/></g><g transform="translate(950.0466206868491 10) rotate(0 263.5 156)"><text x="0" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">to have a layout with columns</text><text x="0" y="43" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">we can use css grid on the container:</text><text x="0" y="67" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">display:grid; </text><text x="0" y="91" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">^^^ this line activates grid</text><text x="0" y="115" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">grid-template-columns: 1fr 1fr 1fr 1fr;</text><text x="0" y="139" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">^^^ this line creates 4 columns of equal size</text><text x="0" y="163" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr"/><text x="0" y="187" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr"/><text x="0" y="211" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">and just with that all the direct</text><text x="0" y="235" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">children of this container are going to</text><text x="0" y="259" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">be put into the columns based on the</text><text x="0" y="283" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">order of html. If we have 7 direct children </text><text x="0" y="307" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">they will be positioned as in the picture</text></g><g stroke-linecap="round"><g transform="translate(928.0919309698459 37.15854569881901) rotate(0 -53.07610983370478 -2.509680990047741)"><path d="M0.88 0.65 C-16.8 0.01, -89.25 -3.08, -107.03 -3.7 M-0.12 -0.06 C-17.36 -1.09, -87.14 -4.85, -104.86 -5.66" stroke="#000000" stroke-width="1" fill="none"/></g><g transform="translate(928.0919309698459 37.15854569881901) rotate(0 -53.07610983370478 -2.509680990047741)"><path d="M-75.11 -16.21 C-82.01 -12, -87.33 -9.1, -105.51 -6.99 M-75.91 -15.16 C-83.53 -12.16, -90.59 -9.32, -105.3 -5.07" stroke="#000000" stroke-width="1" fill="none"/></g><g transform="translate(928.0919309698459 37.15854569881901) rotate(0 -53.07610983370478 -2.509680990047741)"><path d="M-76.15 4.29 C-82.83 3.96, -87.93 2.32, -105.51 -6.99 M-76.95 5.34 C-84.49 3.48, -91.31 1.47, -105.3 -5.07" stroke="#000000" stroke-width="1" fill="none"/></g></g></svg>
